@@ -14,8 +14,10 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   image: {
-    type: String 
-  },
+  type: String,
+  default: "https://cdn-icons-png.flaticon.com/512/149/149071.png"
+  }
+  ,
   address: {
     type: Object,
     default: { line1: '', line2: '' }
