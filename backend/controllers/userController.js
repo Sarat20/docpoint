@@ -63,4 +63,62 @@ const loginUser = async (req, res) => {
     }
 };
 
-export { registerUser, loginUser };
+
+
+const getProfile = async (req, res) => {
+  try {
+    const userData = await userModel.findById(req.user.id).select('-password');
+    if (!userData) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.status(200).json({ success: true, user: userData });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+import { v2 as cloudinary } from "cloudinary";
+
+const updateProfile = async (req, res) => {
+  try {
+    const { name, phone, address, dob, gender } = req.body;
+    const userId = req.user.id;
+    const imageFile = req.file;
+
+    if (!name || !phone || !address || !dob || !gender) {
+      return res.status(400).json({ success: false, message: "Data Missing" });
+    }
+
+    const parsedAddress = typeof address === "string" ? JSON.parse(address) : address;
+
+    const updateData = {
+      name,
+      phone,
+      address: parsedAddress,
+      dob,
+      gender,
+    };
+
+    if (imageFile) {
+      const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
+        resource_type: 'image',
+        folder: 'avatars',
+      });
+      updateData.image = imageUpload.secure_url;
+    }
+
+    const updatedUser = await userModel.findByIdAndUpdate(userId, updateData, { new: true }).select("-password");
+
+    res.status(200).json({ success: true, message: "Profile updated", user: updatedUser });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+export { registerUser, loginUser ,getProfile,updateProfile};
