@@ -28,8 +28,8 @@ const Footer = () => {
       <div>
         <h2 className="text-xl font-medium mb-5">Get In Touch</h2>
         <ul className="flex flex-col gap-2 text-gray-600">
-          <li className="cursor-pointer hover:text-gray-800">+1-2-2-435-4578</li>
-          <li className="cursor-pointer hover:text-gray-800">saratkumarkalagara@gmail.com</li>
+          <li className="cursor-pointer hover:text-gray-800">+91 8688632729</li>
+          <li className="cursor-pointer hover:text-gray-800">saratkumarkalagara2398s@gmail.com</li>
         </ul>
       </div>
 
@@ -37,7 +37,7 @@ const Footer = () => {
       <div className="col-span-full">
         <hr className="border-gray-300" />
         <p className="py-5 text-sm text-center text-gray-600">
-          &copy; 2024 Prescripto - All Rights Reserved
+          &copy; 2024 DocPoint - All Rights Reserved
         </p>
       </div>
     </footer>
