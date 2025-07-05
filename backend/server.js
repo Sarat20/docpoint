@@ -5,11 +5,14 @@ import connectDB from "./config/mongodb.js";
 import userRouter from "./routes/useRoute.js";
 
 const app=express();
-const port =process.env.PORT || 6000;
+const port =process.env.PORT || 2000;
 connectDB();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true            
+}));
 
 app.use('/api/user',userRouter)
 

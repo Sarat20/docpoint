@@ -1,76 +1,157 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+console.log("ENV BACKEND URL:", BASE_URL);
 const Login = () => {
-  const [state, setState] = useState('Sign Up');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
+  const navigate = useNavigate();
 
-  const onsubmitHandler = (event) => {
-    event.preventDefault();
-    // Simulated frontend-only behavior
-    alert(`${state} successful!`);
+  const [mode, setMode] = useState("Sign Up");
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
+
+  const onChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    console.log("Form updated:", { ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg("");
+    setSuccessMsg("");
+
+    const endpoint =
+      mode === "Sign Up" ? "/api/user/register" : "/api/user/login";
+
+    const payload =
+      mode === "Sign Up"
+        ? form
+        : { email: form.email, password: form.password };
+
+    console.log("Submitting to:", `${BASE_URL}${endpoint}`);
+    console.log("Payload:", payload);
+
+    try {
+      const { data } = await axios.post(`${BASE_URL}${endpoint}`, payload, {
+        headers: { "Content-Type": "application/json" },
+        withCredentials: true,
+      });
+
+      console.log("API response:", data);
+
+      if (!data.success) {
+        setErrorMsg(data.message || "Something went wrong");
+        console.warn("❌ Backend responded with error:", data.message);
+      } else {
+        localStorage.setItem("token", data.token);
+        setSuccessMsg(`${mode} successful!`);
+        console.log("✅ Success:", `${mode} successful!`);
+        setForm({ name: "", email: "", password: "" });
+
+        setTimeout(() => {
+          console.log("Navigating to home...");
+          navigate("/");
+        }, 1000);
+      }
+    } catch (err) {
+      const msg =
+        err.response?.data?.message || "Server error – please try again later";
+      setErrorMsg(msg);
+      console.error("❌ Axios error:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div>
-      <form onSubmit={onsubmitHandler} className='min-h-[80vh] flex items-center'>
-        <div className='flex flex-col gap-3 m-auto items-start p-8 min-w-[340px] sm:min-w-96 border rounded-xl text-zinc-600 text-sm shadow-lg'>
-          <p className='text-2xl font-semibold'>
-            {state === 'Sign Up' ? "Create Account" : "Login"}
-          </p>
-          <p>Please {state === 'Sign Up' ? "sign up " : "log in "}to book appointment</p>
+      <form onSubmit={handleSubmit} className="min-h-[80vh] flex items-center">
+        <div className="flex flex-col gap-3 m-auto items-start p-8 
+                        min-w-[340px] sm:min-w-96 border rounded-xl
+                        text-zinc-600 text-sm shadow-lg">
 
-          {state === 'Sign Up' && (
-            <div className='w-full'>
+          <p className="text-2xl font-semibold">
+            {mode === "Sign Up" ? "Create Account" : "Login"}
+          </p>
+          <p>
+            Please {mode === "Sign Up" ? "sign up " : "log in "}to book appointment
+          </p>
+
+          {mode === "Sign Up" && (
+            <div className="w-full">
               <p>Full Name</p>
               <input
-                className='border border-zinc-300 rounded w-full p-2 mt-1'
-                type="text"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
+                name="name"
+                value={form.name}
+                onChange={onChange}
+                className="border border-zinc-300 rounded w-full p-2 mt-1"
                 required
               />
             </div>
           )}
 
-          <div className='w-full'>
+          <div className="w-full">
             <p>Email</p>
             <input
-              className='border border-zinc-300 rounded w-full p-2 mt-1'
               type="email"
-              onChange={(e) => setEmail(e.target.value)}
-              value={email}
+              name="email"
+              value={form.email}
+              onChange={onChange}
+              className="border border-zinc-300 rounded w-full p-2 mt-1"
               required
             />
           </div>
 
-          <div className='w-full'>
+          <div className="w-full">
             <p>Password</p>
             <input
-              className='border border-zinc-300 rounded w-full p-2 mt-1'
               type="password"
-              onChange={(e) => setPassword(e.target.value)}
-              value={password}
+              name="password"
+              value={form.password}
+              onChange={onChange}
+              className="border border-zinc-300 rounded w-full p-2 mt-1"
               required
             />
           </div>
 
-          <button type='submit' className='text-white bg-primary text-center w-full py-2 rounded-md text-base'>
-            {state === 'Sign Up' ? "Create Account" : "Login"}
+          {errorMsg && <p className="text-red-600 text-xs mt-1">{errorMsg}</p>}
+          {successMsg && <p className="text-green-600 text-xs mt-1">{successMsg}</p>}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="text-white bg-primary text-center w-full py-2 rounded-md
+                       text-base hover:opacity-90 disabled:opacity-60">
+            {loading
+              ? mode === "Sign Up" ? "Signing up…" : "Logging in…"
+              : mode === "Sign Up" ? "Create Account" : "Login"}
           </button>
 
-          {state === 'Sign Up' ? (
+          {mode === "Sign Up" ? (
             <p>
-              Already have an account?{' '}
-              <span onClick={() => setState('Login')} className='text-primary underline cursor-pointer'>
+              Already have an account?{" "}
+              <span
+                onClick={() => {
+                  console.log("Switching to Login mode");
+                  setMode("Login");
+                }}
+                className="text-primary underline cursor-pointer">
                 Login here
               </span>
             </p>
           ) : (
             <p>
-              Create a new account?{' '}
-              <span onClick={() => setState('Sign Up')} className='text-primary underline cursor-pointer'>
+              Create a new account?{" "}
+              <span
+                onClick={() => {
+                  console.log("Switching to Sign Up mode");
+                  setMode("Sign Up");
+                }}
+                className="text-primary underline cursor-pointer">
                 Click here
               </span>
             </p>
