@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const defaultImage = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
@@ -7,34 +8,31 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 const Profile = () => {
   const [user, setUser] = useState({
     name: "",
-    email: "",
     phone: "",
     gender: "Not Selected",
-    dob: "Not Selected",
+    dob: "",
     address: { line1: "", line2: "" },
     image: ""
   });
 
-  const [previewImage, setPreviewImage] = useState(defaultImage);
+  const [preview, setPreview] = useState(defaultImage);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
+  const [mode, setMode] = useState("view");
 
-  // Fetch current user profile
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get(`${BASE_URL}/api/user/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        withCredentials: true
+      const { data } = await axios.get(`${BASE_URL}/api/user/get-profile`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
-      setUser(data.user);
-      setPreviewImage(data.user.image || defaultImage);
+      const fetched = data.user;
+      const addr = fetched.address || { line1: "", line2: "" };
+      setUser({ ...fetched, address: addr, image: "" });
+      setPreview(fetched.image || defaultImage);
     } catch (err) {
-      console.error("❌ Error fetching profile:", err);
-      setMessage("Failed to load profile.");
+      console.error("Fetch profile failed:", err.response?.data || err.message);
+      toast.error("Failed to load profile.");
     }
   };
 
@@ -45,159 +43,179 @@ const Profile = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "line1" || name === "line2") {
-      setUser({ ...user, address: { ...user.address, [name]: value } });
+      setUser((prev) => ({
+        ...prev,
+        address: { ...prev.address, [name]: value }
+      }));
     } else {
-      setUser({ ...user, [name]: value });
+      setUser((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUser({ ...user, image: file });
-      setPreviewImage(URL.createObjectURL(file));
+      setUser((prev) => ({ ...prev, image: file }));
+      setPreview(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
     try {
-      const formData = new FormData();
-      formData.append("name", user.name);
-      formData.append("phone", user.phone);
-      formData.append("gender", user.gender);
-      formData.append("dob", user.dob);
-      formData.append("line1", user.address.line1);
-      formData.append("line2", user.address.line2);
+      const fd = new FormData();
+      fd.append("name", user.name);
+      fd.append("phone", user.phone);
+      fd.append("gender", user.gender);
+      fd.append("dob", user.dob);
+      fd.append("address", JSON.stringify(user.address));
       if (user.image instanceof File) {
-        formData.append("image", user.image);
+        fd.append("image", user.image);
       }
 
       const token = localStorage.getItem("token");
-      const { data } = await axios.put(`${BASE_URL}/api/user/profile`, formData, {
+
+      const { data } = await axios.post(`${BASE_URL}/api/user/update-profile`, fd, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data"
-        },
-        withCredentials: true
+        }
       });
 
-      setMessage("✅ Profile updated successfully.");
-      setUser(data.user);
+      const updated = data.user;
+      setUser({ ...updated, image: "", address: updated.address || { line1: "", line2: "" } });
+      setPreview(updated.image || defaultImage);
+      setMode("view");
+      toast.success("Profile updated successfully.");
     } catch (err) {
-      console.error("❌ Error updating profile:", err);
-      setMessage("❌ Failed to update profile.");
+      console.error("Update failed:", err);
+      toast.error("Failed to update profile.");
     } finally {
       setLoading(false);
     }
+ 
+   window.location.reload();
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 p-6 border rounded-xl shadow">
-      <h2 className="text-2xl font-semibold mb-6">Edit Profile</h2>
+    <div className="max-w-2xl mx-auto mt-10 p-6 border rounded-xl shadow text-base text-zinc-800">
+      <h2 className="text-3xl font-bold mb-6">My Profile</h2>
 
-      {message && (
-        <p className="text-sm mb-4 text-center text-blue-600">{message}</p>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-4 text-sm text-zinc-700">
-        {/* Avatar */}
-        <div className="flex items-center gap-4">
-          <img
-            src={previewImage}
-            alt="User"
-            className="w-20 h-20 rounded-full object-cover border"
-          />
+      <div className="flex items-center gap-6 mb-6">
+        <img
+          src={preview}
+          alt="avatar"
+          className="w-32 h-32 rounded-full object-cover border"
+        />
+        {mode === "edit" && (
           <input type="file" accept="image/*" onChange={handleImageChange} />
-        </div>
+        )}
+      </div>
 
-        <div>
-          <label>Name</label>
-          <input
-            name="name"
-            value={user.name}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-            required
-          />
-        </div>
-
-        <div>
-          <label>Email</label>
-          <input
-            value={user.email}
-            readOnly
-            className="w-full p-2 border rounded bg-gray-100 mt-1"
-          />
-        </div>
-
-        <div>
-          <label>Phone</label>
-          <input
-            name="phone"
-            value={user.phone}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-          />
-        </div>
-
-        <div>
-          <label>Gender</label>
-          <select
-            name="gender"
-            value={user.gender}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
+      {mode === "view" ? (
+        <div className="space-y-3">
+          <p><strong>Name:</strong> {user.name}</p>
+          <p><strong>Phone:</strong> {user.phone}</p>
+          <p><strong>Gender:</strong> {user.gender}</p>
+          <p><strong>Date of Birth:</strong> {user.dob}</p>
+          <p><strong>Address Line 1:</strong> {user.address.line1}</p>
+          <p><strong>Address Line 2:</strong> {user.address.line2}</p>
+          <button
+            className="mt-5 bg-primary text-white py-2 px-6 rounded hover:opacity-90"
+            onClick={() => setMode("edit")}
           >
-            <option value="Not Selected">Not Selected</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
+            Edit Profile
+          </button>
         </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label>Name</label>
+            <input
+              name="name"
+              value={user.name}
+              onChange={handleChange}
+              className="w-full p-2 border rounded mt-1"
+              required
+            />
+          </div>
 
-        <div>
-          <label>Date of Birth</label>
-          <input
-            type="date"
-            name="dob"
-            value={user.dob !== "Not Selected" ? user.dob : ""}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-          />
-        </div>
+          <div>
+            <label>Phone</label>
+            <input
+              name="phone"
+              value={user.phone}
+              onChange={handleChange}
+              className="w-full p-2 border rounded mt-1"
+            />
+          </div>
 
-        <div>
-          <label>Address Line 1</label>
-          <input
-            name="line1"
-            value={user.address.line1}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-          />
-        </div>
+          <div>
+            <label>Gender</label>
+            <select
+              name="gender"
+              value={user.gender}
+              onChange={handleChange}
+              className="w-full p-2 border rounded mt-1"
+            >
+              <option value="Not Selected">Not Selected</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
 
-        <div>
-          <label>Address Line 2</label>
-          <input
-            name="line2"
-            value={user.address.line2}
-            onChange={handleChange}
-            className="w-full p-2 border rounded mt-1"
-          />
-        </div>
+          <div>
+            <label>Date of Birth</label>
+            <input
+              type="date"
+              name="dob"
+              value={user.dob !== "Not Selected" ? user.dob : ""}
+              onChange={handleChange}
+              className="w-full p-2 border rounded mt-1"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-primary text-white py-2 px-4 rounded hover:opacity-90 disabled:opacity-60"
-        >
-          {loading ? "Saving..." : "Save Changes"}
-        </button>
-      </form>
+          <div>
+            <label>Address Line 1</label>
+            <input
+              name="line1"
+              value={user.address.line1}
+              onChange={handleChange}
+              className="w-full p-2 border rounded mt-1"
+            />
+          </div>
+
+          <div>
+            <label>Address Line 2</label>
+            <input
+              name="line2"
+              value={user.address.line2}
+              onChange={handleChange}
+              className="w-full p-2 border rounded mt-1"
+            />
+          </div>
+
+          <div className="flex gap-4 mt-6">
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-primary text-white py-2 px-6 rounded hover:opacity-90 disabled:opacity-60"
+            >
+              {loading ? "Saving…" : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("view")}
+              className="bg-gray-300 text-black py-2 px-6 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 };

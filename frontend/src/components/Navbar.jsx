@@ -1,11 +1,35 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios"; 
 import { assets } from "../assets/assets";
 import { NavLink, useNavigate } from "react-router-dom";
+
+const defaultImage = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL; // ✅ ADDED
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState(defaultImage);
+
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const { data } = await axios.get(`${BASE_URL}/api/user/get-profile`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProfileImage(data.user.image || defaultImage);
+      } catch (err) {
+        console.error("Failed to load avatar:", err);
+        setProfileImage(defaultImage);
+      }
+    };
+
+    if (isLoggedIn) {
+      fetchProfileImage();
+    }
+  }, [isLoggedIn]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -29,28 +53,46 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
       />
 
       <ul className="hidden md:flex items-start gap-5 font-medium">
-        <NavLink to="/"><li className="py-1">Home</li></NavLink>
-        <NavLink to="/doctors"><li className="py-1">All Doctors</li></NavLink>
-        <NavLink to="/about"><li className="py-1">About</li></NavLink>
-        <NavLink to="/contact"><li className="py-1">Contact</li></NavLink>
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? "text-primary" : "")}
+        >
+          <li className="py-1">Home</li>
+        </NavLink>
+        <NavLink
+          to="/doctors"
+          className={({ isActive }) => (isActive ? "text-primary" : "")}
+        >
+          <li className="py-1">All Doctors</li>
+        </NavLink>
+        <NavLink
+          to="/about"
+          className={({ isActive }) => (isActive ? "text-primary" : "")}
+        >
+          <li className="py-1">About</li>
+        </NavLink>
+        <NavLink
+          to="/contact"
+          className={({ isActive }) => (isActive ? "text-primary" : "")}
+        >
+          <li className="py-1">Contact</li>
+        </NavLink>
       </ul>
 
       <div className="flex items-center gap-4 relative">
-        {!isLoggedIn && (
+        {!isLoggedIn ? (
           <button
             onClick={() => navigate("/login")}
             className="bg-primary text-white px-6 py-2 rounded-full hidden md:block"
           >
             Create Account
           </button>
-        )}
-
-        {isLoggedIn && (
+        ) : (
           <div className="relative">
             <img
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="w-10 h-10 rounded-full object-cover cursor-pointer"
-              src={assets.user_avatar || "/default-avatar.png"}
+              className="w-10 h-10 rounded-full object-cover cursor-pointer border"
+              src={profileImage}
               alt="User"
             />
             {dropdownOpen && (
@@ -60,6 +102,15 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                   className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                 >
                   Profile
+                </button>
+                <button
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    navigate("/appointments"); 
+                  }}
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                >
+                  My Appointments
                 </button>
                 <button
                   onClick={handleLogout}
