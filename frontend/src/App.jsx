@@ -9,6 +9,7 @@ import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Profile from './pages/Profile';
+import DoctorLogin from './DoctorPages/DoctorLogin';
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -31,6 +32,8 @@ const App = () => {
         <Route path="/contact" element={<Contact />} />
 
         <Route path="/profile" element={<Profile />} />
+        <Route path="/doctor-login" element={<DoctorLogin />} />
+
 
       </Routes>
 

@@ -9,6 +9,10 @@ const Header = () => {
     navigate('/login');
   };
 
+  const handleDoctorLoginClick = () => {
+    navigate('/doctor-login');
+  };
+
   return (
     <div className='flex flex-col md:flex-row flex-wrap bg-primary rounded-lg px-6 md:px-10 lg:px-20'>
       {/* ----------left side---- */}
@@ -36,15 +40,13 @@ const Header = () => {
             <img className='w-3' src={assets.arrow_icon} alt="" />
           </button>
 
-          {/* Doctor Login Button (fixed with hover) */}
-          <a
-            href="/doctor-login"
-            target="_blank"
-            rel="noopener noreferrer"
-            className='inline-flex items-center justify-center border border-white px-8 py-3 rounded-full text-sm text-black bg-white transition-all duration-300 hover:bg-gray-200 hover:shadow-md hover:text-gray-800' // Added hover:text-gray-800
+          {/* Doctor Login Button (same-tab navigation) */}
+          <button
+            onClick={handleDoctorLoginClick}
+            className='flex items-center justify-center bg-white border border-white px-8 py-3 rounded-full text-sm text-black transition-all duration-300 hover:bg-gray-200 hover:shadow-md'
           >
             Doctor Login
-          </a>
+          </button>
         </div>
       </div>
 
