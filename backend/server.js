@@ -5,6 +5,7 @@ import connectDB from "./config/mongodb.js";
 import connectCloudinary from "./config/cloudinary.js";
 
 import userRouter from "./routes/userRoute.js";
+import doctorRouter from "./routes/doctorRoute.js";
 
 const app=express();
 const port =process.env.PORT || 2000;
@@ -17,7 +18,7 @@ app.use(cors({
 }));
 
 app.use('/api/user',userRouter)
-
+app.use('/api/doctor',doctorRouter)
 
 app.get('/',(req,res)=>{
     res.status(200).send('Hello World')
