@@ -25,14 +25,27 @@ const Header = () => {
           </p>
         </div>
 
-        {/* 👇 Updated button to trigger navigation */}
-        <button
-          onClick={handleBookClick}
-          className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-sm text-grey-500 m-auto md:m-0 hover:scale-105 transition-all duration-300'
-        >
-          Book Appointment
-          <img className='w-3' src={assets.arrow_icon} alt="" />
-        </button>
+        {/* Buttons */}
+        <div className='flex flex-col sm:flex-row gap-4 m-auto md:m-0'>
+          {/* Book Appointment Button */}
+          <button
+            onClick={handleBookClick}
+            className='flex items-center gap-2 bg-white px-8 py-3 rounded-full text-sm text-gray-600 transition-all duration-300 hover:scale-105 hover:shadow-md'
+          >
+            Book Appointment
+            <img className='w-3' src={assets.arrow_icon} alt="" />
+          </button>
+
+          {/* Doctor Login Button (fixed with hover) */}
+          <a
+            href="/doctor-login"
+            target="_blank"
+            rel="noopener noreferrer"
+            className='inline-flex items-center justify-center border border-white px-8 py-3 rounded-full text-sm text-black bg-white transition-all duration-300 hover:bg-gray-200 hover:shadow-md hover:text-gray-800' // Added hover:text-gray-800
+          >
+            Doctor Login
+          </a>
+        </div>
       </div>
 
       {/* ---------right side--- */}
