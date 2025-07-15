@@ -108,7 +108,7 @@ const DoctorLogin = () => {
         }, 1000);
       }
     } catch (err) {
-      console.error("Doctor login/signup error:", err.response?.data || err.message); // Log full error response
+      console.error("Doctor login/signup error:", err.response?.data || err.message); 
       const msg =
         err.response?.data?.message || "Server error – please try again later";
       setErrorMsg(msg);
