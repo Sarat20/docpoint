@@ -1,6 +1,6 @@
-// src/pages/DoctorList.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
@@ -8,14 +8,11 @@ const DoctorList = () => {
   const [doctors, setDoctors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedSpeciality, setSelectedSpeciality] = useState("General physician");
+  const navigate = useNavigate();
 
   const specialities = [
-    "General physician",
-    "Gynecologist",
-    "Dermatologist",
-    "Pediatricians",
-    "Neurologist",
-    "Gastroenterologist"
+    "General physician", "Gynecologist", "Dermatologist",
+    "Pediatricians", "Neurologist", "Gastroenterologist"
   ];
 
   useEffect(() => {
@@ -34,15 +31,12 @@ const DoctorList = () => {
     fetchDoctors();
   }, []);
 
-  const filteredDoctors = doctors.filter(
-    doc => doc.speciality === selectedSpeciality
-  );
+  const filteredDoctors = doctors.filter(doc => doc.speciality === selectedSpeciality);
 
   return (
     <div className="min-h-[80vh] p-6">
-      <h1 className="text-2xl font-semibold mb-2">Browse through the doctors specialist</h1>
+      <h1 className="text-2xl font-semibold mb-4">Browse through the doctors</h1>
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Sidebar - Specialities */}
         <div className="flex flex-col gap-3">
           {specialities.map((item) => (
             <button
@@ -59,7 +53,6 @@ const DoctorList = () => {
           ))}
         </div>
 
-        {/* Doctor Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 flex-1">
           {loading ? (
             <p>Loading doctors...</p>
@@ -67,22 +60,21 @@ const DoctorList = () => {
             <p>No doctors found for this speciality.</p>
           ) : (
             filteredDoctors.map((doctor) => (
-           <div
-  key={doctor._id}
-  className="bg-white text-gray-800 border rounded-xl p-4 shadow-sm hover:shadow-md transition duration-300"
->
-  <img
-    src={doctor.image}
-    alt={doctor.name}
-    className="w-full h-40 object-cover rounded-md mb-3"
-  />
-  <h2 className="text-lg font-semibold">{doctor.name}</h2>
-  <p className="text-sm text-gray-600 mb-1">{doctor.degree}</p>
-  <p className="text-sm text-gray-600">{doctor.experience} years experience</p>
-  <p className="text-sm text-gray-700 font-medium mt-2">₹{doctor.fees} consultation</p>
-</div>
-
-
+              <div
+                key={doctor._id}
+                onClick={() => navigate(`/doctor/${doctor._id}`)}
+                className="cursor-pointer bg-white text-gray-800 border rounded-xl p-4 shadow-sm hover:shadow-md transition"
+              >
+                <img
+                  src={doctor.image}
+                  alt={doctor.name}
+                  className="w-full h-40 object-cover rounded-md mb-3"
+                />
+                <h2 className="text-lg font-semibold">{doctor.name}</h2>
+                <p className="text-sm text-gray-600">{doctor.degree}</p>
+                <p className="text-sm">{doctor.experience} years experience</p>
+                <p className="text-sm font-medium mt-2">₹{doctor.fees} consultation</p>
+              </div>
             ))
           )}
         </div>

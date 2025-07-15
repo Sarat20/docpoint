@@ -15,7 +15,6 @@ import DoctorList from './DoctorPages/DoctorList';
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Check login status on route change
   const location = useLocation();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -36,7 +35,6 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path='/doctors' element={<DoctorList/>}/>
-
       </Routes>
 
       <Footer />

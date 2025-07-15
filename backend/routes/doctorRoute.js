@@ -5,6 +5,7 @@ import {
   doctorList,
   appointmentsDoctor,
   changeAvailability,
+  getDoctorById,
 } from "../controllers/doctorController.js";
 import authDoctor from "../middleware/authDoctor.js";
 import upload from "../middleware/multer.js";
@@ -15,5 +16,7 @@ doctorRouter.post('/login', loginDoctor);
 doctorRouter.get('/list', doctorList);        
 doctorRouter.get('/appointments', authDoctor, appointmentsDoctor); 
 doctorRouter.post('/change-availability', authDoctor, changeAvailability); 
+doctorRouter.get('/:id', getDoctorById);
+
 
 export default doctorRouter;

@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import validator from 'validator';
 import cloudinary from 'cloudinary';
+import mongoose from 'mongoose';
+
 
 const registerDoctor = async (req, res) => {
   try {
@@ -166,10 +168,32 @@ const appointmentsDoctor = async (req, res) => {
 };
 
 
+const getDoctorById = async (req, res) => {
+  const doctorId = req.params.id;
+
+  if (!mongoose.Types.ObjectId.isValid(doctorId)) {
+    return res.status(400).json({ success: false, message: "Invalid doctor ID" });
+  }
+
+  try {
+    const doctor = await doctorModel.findById(doctorId).select("-password");
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found" });
+    }
+
+    res.status(200).json({ success: true, doctor });
+
+  } catch (error) {
+    console.error("Error fetching doctor:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
 export {
     registerDoctor,
     loginDoctor,
     changeAvailability,
     doctorList,
-    appointmentsDoctor
+    appointmentsDoctor,
+    getDoctorById
 };
