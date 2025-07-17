@@ -149,25 +149,32 @@ const DoctorProfile = () => {
                 </div>
 
                 <div className="flex flex-wrap gap-3 mb-6">
-                    {timeSlots.map((slot) => {
-                        const isBooked = isSlotBooked(slot);
-                        return (
-                            <button
-                                key={slot}
-                                disabled={isBooked}
-                                onClick={() => setSelectedTime(slot)}
-                                className={`px-4 py-2 rounded-full border transition-colors ${
-                                    isBooked
-                                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                        : selectedTime === slot
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-white text-gray-800 hover:bg-blue-100"
-                                }`}
-                            >
-                                {slot}
-                            </button>
-                        );
-                    })}
+                    {timeSlots
+  .filter((slot) => {
+    if (!selectedDate.isSame(dayjs(), "day")) return true;
+    const slotTime = dayjs(`${selectedDate.format("YYYY-MM-DD")} ${slot}`, "YYYY-MM-DD hh:mm A");
+    return slotTime.isAfter(dayjs());
+  })
+  .map((slot) => {
+    const isBooked = isSlotBooked(slot);
+    return (
+      <button
+        key={slot}
+        disabled={isBooked}
+        onClick={() => setSelectedTime(slot)}
+        className={`px-4 py-2 rounded-full border transition-colors ${
+          isBooked
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : selectedTime === slot
+            ? "bg-blue-600 text-white"
+            : "bg-white text-gray-800 hover:bg-blue-100"
+        }`}
+      >
+        {slot}
+      </button>
+    );
+  })}
+
                 </div>
 
                 <button
