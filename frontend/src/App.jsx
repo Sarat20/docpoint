@@ -11,7 +11,7 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import DoctorLogin from './DoctorPages/DoctorLogin';
 import DoctorList from './DoctorPages/DoctorList';
-
+import DoctorProfile from './DoctorPages/DoctorProfile'
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -35,6 +35,8 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path='/doctors' element={<DoctorList/>}/>
+        <Route path='/doctor/:id' element={<DoctorProfile/>}/>
+
       </Routes>
 
       <Footer />

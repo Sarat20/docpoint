@@ -6,6 +6,7 @@ import connectCloudinary from "./config/cloudinary.js";
 
 import userRouter from "./routes/userRoute.js";
 import doctorRouter from "./routes/doctorRoute.js";
+import appointmentRouter from "./routes/appointmentRoute.js";
 
 const app=express();
 const port =process.env.PORT || 2000;
@@ -19,6 +20,7 @@ app.use(cors({
 
 app.use('/api/user',userRouter)
 app.use('/api/doctor',doctorRouter)
+app.use("/api/appointment", appointmentRouter);
 
 app.get('/',(req,res)=>{
     res.status(200).send('Hello World')
