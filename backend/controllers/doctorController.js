@@ -17,9 +17,9 @@ const registerDoctor = async (req, res) => {
       degree,
       experience,
       about,
-      available, 
+      available,
       fees,
-      address, 
+      address,
       dob,
       gender,
       phone
@@ -69,7 +69,7 @@ const registerDoctor = async (req, res) => {
         return res.status(400).json({ success: false, message: "Invalid address format" });
     }
 
-    const isAvailable = available === 'true'; 
+    const isAvailable = available === 'true';
 
     const newDoctor = new doctorModel({
       name,
@@ -85,7 +85,7 @@ const registerDoctor = async (req, res) => {
       dob,
       gender,
       phone,
-      address: parsedAddress, 
+      address: parsedAddress,
       date: Date.now()
     });
 
@@ -97,7 +97,7 @@ const registerDoctor = async (req, res) => {
 
     res.status(201).json({ success: true, dtoken: token });
   } catch (error) {
-    console.error("Doctor registration error:", error); 
+    console.error("Doctor registration error:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 };
@@ -105,20 +105,20 @@ const registerDoctor = async (req, res) => {
 
 const loginDoctor = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const doctor = await doctorModel.findOne({ email });
+      const { email, password } = req.body;
+      const doctor = await doctorModel.findOne({ email });
 
-        if (!doctor) {
-            return res.status(400).json({ success: false, message: "Invalid Credentials" });
-        }
+      if (!doctor) {
+          return res.status(400).json({ success: false, message: "Invalid Credentials" });
+      }
 
-        const isMatch = await bcrypt.compare(password, doctor.password);
-        if (!isMatch) {
-            return res.status(400).json({ success: false, message: "Invalid Credentials" });
-        }
+      const isMatch = await bcrypt.compare(password, doctor.password);
+      if (!isMatch) {
+          return res.status(400).json({ success: false, message: "Invalid Credentials" });
+      }
 
-        const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
-        res.json({ success: true, token });
+      const token = jwt.sign({ id: doctor._id }, process.env.JWT_SECRET_KEY, { expiresIn: "1d" });
+      res.json({ success: true, token });
 
     } catch (error) {
         console.log(error);
@@ -128,7 +128,7 @@ const loginDoctor = async (req, res) => {
 
 const changeAvailability = async (req, res) => {
     try {
-        const doctorId = req.user.id; 
+        const doctorId = req.user.id;
         const docData = await doctorModel.findById(doctorId);
 
         if (!docData) {
@@ -158,7 +158,7 @@ const doctorList = async (req, res) => {
 
 const appointmentsDoctor = async (req, res) => {
     try {
-        const doctorId = req.user.id; 
+        const doctorId = req.user.id;
         const appointments = await appointmentModel.find({ docId: doctorId });
         res.json({ success: true, appointments });
     } catch (error) {
@@ -189,11 +189,85 @@ const getDoctorById = async (req, res) => {
   }
 };
 
+const getDoctorProfile = async (req, res) => {
+  try {
+    console.log("Decoded token user object:", req.user); // Debug log
+
+    const doctorId = req.user.id;
+    console.log("Doctor ID:", doctorId); // Debug log
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(doctorId)) {
+      return res.status(400).json({ success: false, message: "Invalid doctor ID" });
+    }
+
+    const doctor = await doctorModel.findById(doctorId).select('-password');
+
+    if (!doctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found" });
+    }
+
+    res.status(200).json({ success: true, doctor });
+
+  } catch (error) {
+    console.error("Error in getDoctorProfile:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+const updateDoctorProfile = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+
+    const updateFields = req.body; // name, degree, speciality, etc.
+
+    const updatedDoctor = await doctorModel.findByIdAndUpdate(
+      doctorId,
+      updateFields,
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedDoctor) {
+      return res.status(404).json({ success: false, message: "Doctor not found" });
+    }
+
+    res.status(200).json({ success: true, doctor: updatedDoctor });
+  } catch (error) {
+    console.error("Update Doctor Profile Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+const cancelAppointmentByDoctor = async (req, res) => {
+  try {
+    const doctorId = req.user.id;
+    const appointmentId = req.params.id;
+
+    const appointment = await appointmentModel.findOne({ _id: appointmentId, docId: doctorId });
+    if (!appointment) {
+      return res.status(404).json({ success: false, message: "Appointment not found" });
+    }
+
+    await appointmentModel.findByIdAndDelete(appointmentId);
+
+    res.json({ success: true, message: "Appointment cancelled successfully" });
+  } catch (error) {
+    console.error("Doctor Cancel Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+};
+
+
+
 export {
     registerDoctor,
     loginDoctor,
     changeAvailability,
     doctorList,
     appointmentsDoctor,
-    getDoctorById
+    getDoctorById,
+    getDoctorProfile,
+    updateDoctorProfile,
+    cancelAppointmentByDoctor
 };

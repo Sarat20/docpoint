@@ -104,8 +104,8 @@ const DoctorLogin = () => {
         });
 
         setTimeout(() => {
-          navigate("/");
-        }, 1000);
+  navigate("/doctor/dashboard");
+}, 1000);
       }
     } catch (err) {
       console.error("Doctor login/signup error:", err.response?.data || err.message); 

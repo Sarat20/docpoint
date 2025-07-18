@@ -13,6 +13,7 @@ import DoctorLogin from './DoctorPages/DoctorLogin';
 import DoctorList from './DoctorPages/DoctorList';
 import DoctorProfile from './DoctorPages/Doctorprofile';
 import UserAppointments from './pages/UserAppointments';
+import  DoctorDashboard from './DoctorPages/DoctorDashboard';
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -38,6 +39,9 @@ const App = () => {
         <Route path='/doctors' element={<DoctorList/>}/>
         <Route path='/doctor/:id' element={<DoctorProfile/>}/>
         <Route path="/appointments" element={<UserAppointments />} />
+
+        <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+
        
       </Routes>
 

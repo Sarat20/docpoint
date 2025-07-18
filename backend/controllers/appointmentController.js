@@ -106,3 +106,30 @@ export const cancelAppointment = async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 };
+
+// Get total earnings for doctor
+export const getDoctorEarnings = async (req, res) => {
+  try {
+    const earnings = await appointmentModel.aggregate([
+      {
+        $match: {
+          docId: new mongoose.Types.ObjectId(req.user.id),
+          cancelled: false
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$amount" }
+        }
+      }
+    ]);
+
+    const totalEarnings = earnings.length > 0 ? earnings[0].total : 0;
+
+    res.status(200).json({ success: true, totalEarnings });
+  } catch (err) {
+    console.error("Earnings Error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
