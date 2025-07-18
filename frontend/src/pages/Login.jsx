@@ -4,6 +4,8 @@ import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 console.log("ENV BACKEND URL:", BASE_URL);
+console.log("ENV BACKEND URL:", import.meta.env.VITE_BACKEND_URL);
+
 const Login = () => {
   const navigate = useNavigate();
 
