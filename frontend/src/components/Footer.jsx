@@ -1,5 +1,6 @@
 import React from 'react';
-import { assets } from '../assets/assets';
+import { Link } from 'react-router-dom';
+import docpoint_logo from "../assets/docpoint_logo.png";
 
 const Footer = () => {
   return (
@@ -7,9 +8,9 @@ const Footer = () => {
 
       {/* Left */}
       <div>
-        <img className="mb-5 w-40" src={assets.logo_1} alt="Company Logo" />
+        <img className="mb-5 w-40" src={docpoint_logo} alt="Company Logo" />
         <p className="w-full md:w-2/3 text-gray-600 leading-6">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius nihil molestias placeat repellendus vero vitae laudantium doloribus cum sequi non illum tenetur debitis reiciendis aliquam et omnis voluptatibus quod sed.
+          DocPoint is a modern and user-friendly doctor appointment booking platform that bridges the gap between patients and healthcare providers. With just a few clicks, users can discover doctors based on their specialization, check availability, and book appointments online—anytime, anywhere.
         </p>
       </div>
 
@@ -17,10 +18,10 @@ const Footer = () => {
       <div>
         <h2 className="text-xl font-medium mb-5">Company</h2>
         <ul className="flex flex-col gap-2 text-gray-600">
-          <li><a href="#" className="hover:text-gray-800">Home</a></li>
-          <li><a href="#" className="hover:text-gray-800">About Us</a></li>
-          <li><a href="#" className="hover:text-gray-800">Contact Us</a></li>
-          <li><a href="#" className="hover:text-gray-800">Privacy Policy</a></li>
+          <li><Link to="/" className="hover:text-gray-800">Home</Link></li>
+          <li><Link to="/about" className="hover:text-gray-800">About Us</Link></li>
+          <li><Link to="/contact" className="hover:text-gray-800">Contact Us</Link></li>
+          <li><Link to="/" className="hover:text-gray-800">Privacy Policy</Link></li>
         </ul>
       </div>
 
@@ -37,7 +38,7 @@ const Footer = () => {
       <div className="col-span-full">
         <hr className="border-gray-300" />
         <p className="py-5 text-sm text-center text-gray-600">
-          &copy; 2024 DocPoint - All Rights Reserved
+          &copy; 2025 DocPoint - All Rights Reserved
         </p>
       </div>
     </footer>
