@@ -6,7 +6,7 @@ const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const DoctorLogin = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState("Sign Up");
+  const [mode, setMode] = useState("Login");
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -105,6 +105,8 @@ const DoctorLogin = () => {
 
         setTimeout(() => {
   navigate("/doctor/dashboard");
+   window.location.reload(); 
+
 }, 1000);
       }
     } catch (err) {

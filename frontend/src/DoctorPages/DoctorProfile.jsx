@@ -138,7 +138,7 @@ const DoctorProfile = () => {
                             }}
                             className={`px-4 py-2 rounded-full border min-w-[60px] transition-colors ${
                                 day.isSame(selectedDate, "day")
-                                    ? "bg-blue-600 text-white"
+                                    ? "bg-indigo-600 text-white"
                                     : "bg-white text-gray-800 hover:bg-blue-100"
                             }`}
                         >
@@ -166,7 +166,7 @@ const DoctorProfile = () => {
           isBooked
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
             : selectedTime === slot
-            ? "bg-blue-600 text-white"
+            ? "bg-indigo-600 text-white"
             : "bg-white text-gray-800 hover:bg-blue-100"
         }`}
       >
@@ -180,7 +180,7 @@ const DoctorProfile = () => {
                 <button
                     onClick={handleBook}
                     disabled={!selectedTime}
-                    className="px-6 py-2 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-6 py-2 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-600 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     Book Appointment
                 </button>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const DoctorDashboard = () => {
+  const navigate = useNavigate();
   const [doctor, setDoctor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
@@ -15,18 +17,15 @@ const DoctorDashboard = () => {
       const token = localStorage.getItem("dtoken");
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Fetch doctor profile
       const profileRes = await axios.get("http://localhost:2000/api/doctor/get-profile", { headers });
       const doctorData = profileRes.data.doctor;
       setDoctor(doctorData);
       setFormData(doctorData);
 
-      // Fetch doctor appointments
       const appointmentsRes = await axios.get("http://localhost:2000/api/doctor/appointments", { headers });
       const appts = appointmentsRes.data.appointments || [];
       setAppointments(appts);
 
-      // Calculate total earnings from non-cancelled appointments
       const earnings = appts
         .filter(app => !app.cancelled)
         .reduce((acc, app) => acc + (app.fees || doctorData.fees || 0), 0);
@@ -89,10 +88,25 @@ const DoctorDashboard = () => {
     }
   };
 
+  const handleDoctorLogout = () => {
+    localStorage.removeItem("dtoken");
+    toast.success("Logged out successfully");
+    navigate("/doctor-login");
+  };
+
   if (loading) return <div className="p-6 text-center">Loading...</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-10">
+      <div className="flex justify-end">
+        <button
+          onClick={handleDoctorLogout}
+          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+        >
+          Logout
+        </button>
+      </div>
+
       {/* Doctor Profile */}
       <div className="bg-white shadow-md rounded-xl p-6">
         <h2 className="text-2xl font-bold mb-4">Doctor Profile</h2>

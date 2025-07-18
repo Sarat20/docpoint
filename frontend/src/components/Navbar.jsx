@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios"; 
+import axios from "axios";
 import { assets } from "../assets/assets";
 import docpoint_logo from "../assets/docpoint_logo.png";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -12,6 +12,9 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [profileImage, setProfileImage] = useState(defaultImage);
+
+  const isDoctorLoggedIn = !!localStorage.getItem("dtoken");
+  if (isDoctorLoggedIn) return null;
 
   useEffect(() => {
     const fetchProfileImage = async () => {
@@ -98,7 +101,7 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
                   <button
                     onClick={() => {
                       setDropdownOpen(false);
-                      navigate("/appointments"); 
+                      navigate("/appointments");
                     }}
                     className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                   >
