@@ -11,7 +11,7 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import DoctorLogin from './DoctorPages/DoctorLogin';
 import DoctorList from './DoctorPages/DoctorList';
-import DoctorProfile from './DoctorPages/Doctorprofile';
+import Doctorprofile from './DoctorPages/Doctorprofile';
 import UserAppointments from './pages/UserAppointments';
 import DoctorDashboard from './DoctorPages/DoctorDashboard';
 
@@ -45,7 +45,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/doctor-login" element={<DoctorLogin setIsDoctorLoggedIn={setIsDoctorLoggedIn} />} />
         <Route path="/doctors" element={<DoctorList />} />
-        <Route path="/doctor/:id" element={<DoctorProfile />} />
+        <Route path="/doctor/:id" element={<Doctorprofile />} />
         <Route path="/appointments" element={<UserAppointments />} />
         <Route path="/doctor/dashboard" element={<DoctorDashboard setIsDoctorLoggedIn={setIsDoctorLoggedIn} />} />
       </Routes>
