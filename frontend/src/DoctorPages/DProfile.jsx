@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
-const Doctorprofile = () => {
+const DProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -189,4 +189,4 @@ const Doctorprofile = () => {
     );
 };
 
-export default Doctorprofile;
+export default DProfile;

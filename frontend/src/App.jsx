@@ -11,9 +11,10 @@ import Contact from './pages/Contact';
 import Profile from './pages/Profile';
 import DoctorLogin from './DoctorPages/DoctorLogin';
 import DoctorList from './DoctorPages/DoctorList';
-import Doctorprofile from './DoctorPages/Doctorprofile';
 import UserAppointments from './pages/UserAppointments';
 import DoctorDashboard from './DoctorPages/DoctorDashboard';
+import DProfile from './DoctorPages/DProfile';
+
 
 const App = () => {
   const location = useLocation();
@@ -45,7 +46,7 @@ const App = () => {
         <Route path="/profile" element={<Profile />} />
         <Route path="/doctor-login" element={<DoctorLogin setIsDoctorLoggedIn={setIsDoctorLoggedIn} />} />
         <Route path="/doctors" element={<DoctorList />} />
-        <Route path="/doctor/:id" element={<Doctorprofile />} />
+        <Route path="/doctor/:id" element={<DProfile />} />
         <Route path="/appointments" element={<UserAppointments />} />
         <Route path="/doctor/dashboard" element={<DoctorDashboard setIsDoctorLoggedIn={setIsDoctorLoggedIn} />} />
       </Routes>
