@@ -3,6 +3,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
+const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [doctor, setDoctor] = useState(null);
@@ -17,12 +19,12 @@ const DoctorDashboard = () => {
       const token = localStorage.getItem("dtoken");
       const headers = { Authorization: `Bearer ${token}` };
 
-      const profileRes = await axios.get("http://localhost:2000/api/doctor/get-profile", { headers });
+      const profileRes = await axios.get(`${BASE_URL}/api/doctor/get-profile`, { headers });
       const doctorData = profileRes.data.doctor;
       setDoctor(doctorData);
       setFormData(doctorData);
 
-      const appointmentsRes = await axios.get("http://localhost:2000/api/doctor/appointments", { headers });
+      const appointmentsRes = await axios.get(`${BASE_URL}/api/doctor/appointments`, { headers });
       const appts = appointmentsRes.data.appointments || [];
       setAppointments(appts);
 
@@ -58,7 +60,7 @@ const DoctorDashboard = () => {
   const handleUpdate = async () => {
     try {
       const token = localStorage.getItem("dtoken");
-      await axios.post("http://localhost:2000/api/doctor/update-profile", formData, {
+      await axios.post(`${BASE_URL}/api/doctor/update-profile`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       toast.success("Profile updated successfully");
@@ -75,7 +77,7 @@ const DoctorDashboard = () => {
       try {
         const token = localStorage.getItem("dtoken");
         await axios.put(
-          `http://localhost:2000/api/appointment/cancel/${appointmentId}`,
+          `${BASE_URL}/api/appointment/cancel/${appointmentId}`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );

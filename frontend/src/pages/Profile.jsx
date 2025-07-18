@@ -28,7 +28,7 @@ const Profile = () => {
 
       const fetched = data.user;
       const addr = fetched.address || { line1: "", line2: "" };
-      setUser({ ...fetched, address: addr, image: "" }); // Reset image to empty string for file input
+      setUser({ ...fetched, address: addr, image: "" }); 
       setPreview(fetched.image || defaultImage);
     } catch (err) {
       console.error("Fetch profile failed:", err.response?.data || err.message);
@@ -55,8 +55,8 @@ const Profile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUser((prev) => ({ ...prev, image: file })); // Store the File object
-      setPreview(URL.createObjectURL(file)); // Set preview for the new file
+      setUser((prev) => ({ ...prev, image: file })); 
+      setPreview(URL.createObjectURL(file)); 
     }
   };
 
@@ -70,9 +70,9 @@ const Profile = () => {
       fd.append("phone", user.phone);
       fd.append("gender", user.gender);
       fd.append("dob", user.dob);
-      fd.append("address", JSON.stringify(user.address)); // Address is an object, stringify it
+      fd.append("address", JSON.stringify(user.address)); 
       
-      // Only append image if it's a new file (a File object)
+  
       if (user.image instanceof File) {
         fd.append("image", user.image);
       }
@@ -82,19 +82,16 @@ const Profile = () => {
       const { data } = await axios.post(`${BASE_URL}/api/user/update-profile`, fd, {
         headers: {
           Authorization: `Bearer ${token}`,
-          // "Content-Type": "multipart/form-data" // Axios sets this automatically for FormData
+       
         }
       });
 
-      // You can keep these if you want to update the state immediately
-      // before the reload, but the reload will ultimately govern the display.
+     
       const updated = data.user;
       setUser({ ...updated, image: "", address: updated.address || { line1: "", line2: "" } });
       setPreview(updated.image || defaultImage);
       setMode("view");
       toast.success("Profile updated successfully.");
-
-      // Add window.location.reload() here
       window.location.reload(); 
 
     } catch (err) {
