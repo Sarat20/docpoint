@@ -1,11 +1,18 @@
+# 🩺 DocPoint — Doctor Appointment Booking Platform
 
-# 🩺 DocPoint
+**DocPoint** is a full-stack web application built to simplify doctor appointment scheduling.  
+It enables **patients to browse doctors by specialization** and book appointments with chosen time slots.  
+At the same time, **doctors have a separate dashboard** to manage their availability, track appointments, and monitor earnings in real-time.
 
-A full-stack doctor appointment booking platform that allows users to browse doctors by specialization, book appointments with time slots, and enables doctors to manage availability and view earnings in real-time.
+It’s designed to provide a seamless and responsive experience for both mobile and desktop users.
+
+---
 
 ## 🌐 Live Demo
 
 🔗 [Visit DocPoint on Render](https://docpoint.onrender.com/)
+
+---
 
 ## 🧰 Tech Stack
 
@@ -13,6 +20,8 @@ A full-stack doctor appointment booking platform that allows users to browse doc
 **Backend:** Node.js, Express.js, MongoDB, Mongoose, Multer  
 **Authentication:** JWT (JSON Web Tokens)  
 **Deployment:** Render
+
+---
 
 ## 🔑 Features
 
@@ -31,33 +40,65 @@ A full-stack doctor appointment booking platform that allows users to browse doc
 - Book appointments with slot selection
 - Cancel appointments
 
-## 🧭 API Endpoints
+---
 
-### 🔐 Auth & Profile
+## 📦 API Endpoints
 
-#### User
-- `POST /api/user/register` – Register new user
-- `POST /api/user/login` – Login user
-- `GET /api/user/get-profile` – Get user profile (auth required)
-- `POST /api/user/update-profile` – Update profile (auth + file upload)
+### 👤 User Routes
+| Method | Endpoint                   | Description                        |
+|--------|----------------------------|------------------------------------|
+| POST   | `/api/user/register`       | Register a new user                |
+| POST   | `/api/user/login`          | Login as user                      |
+| GET    | `/api/user/get-profile`    | Get user profile                   |
+| POST   | `/api/user/update-profile` | Update profile (with image upload) |
 
-#### Doctor
-- `POST /api/doctor/register` – Register new doctor (with image)
-- `POST /api/doctor/login` – Doctor login
-- `GET /api/doctor/get-profile` – Get doctor profile (auth required)
-- `POST /api/doctor/update-profile` – Update profile (auth required)
-- `GET /api/doctor/list` – Get list of doctors
-- `GET /api/doctor/appointments` – Doctor appointments (auth required)
-- `POST /api/doctor/change-availability` – Change availability (auth required)
-- `GET /api/doctor/:id` – Get doctor by ID
-- `DELETE /api/doctor/cancel/:id` – Doctor cancels appointment (auth required)
+### 👨‍⚕️ Doctor Routes
+| Method | Endpoint                          | Description                          |
+|--------|-----------------------------------|--------------------------------------|
+| POST   | `/api/doctor/register`            | Register a new doctor (image upload) |
+| POST   | `/api/doctor/login`               | Login as doctor                      |
+| GET    | `/api/doctor/get-profile`         | Get doctor profile                   |
+| POST   | `/api/doctor/update-profile`      | Update doctor profile                |
+| GET    | `/api/doctor/list`                | Get list of all doctors              |
+| GET    | `/api/doctor/appointments`        | Get doctor appointments              |
+| POST   | `/api/doctor/change-availability` | Change doctor availability           |
+| GET    | `/api/doctor/:id`                 | Get doctor details by ID             |
+| DELETE | `/api/doctor/cancel/:id`          | Cancel appointment by doctor         |
 
-#### Appointment
-- `POST /api/appointment/create` – Create new appointment (auth required)
-- `GET /api/appointment/user` – Get user appointments (auth required)
-- `GET /api/appointment/doctor` – Get doctor appointments (auth required)
-- `PUT /api/appointment/cancel/:appointmentId` – Cancel appointment (user auth)
-- `GET /api/appointment/earnings` – Get doctor earnings (auth required)
+### 📅 Appointment Routes
+| Method | Endpoint                                  | Description                    |
+|--------|-------------------------------------------|--------------------------------|
+| POST   | `/api/appointment/create`                 | Create new appointment         |
+| GET    | `/api/appointment/user`                   | Get all appointments of user   |
+| GET    | `/api/appointment/doctor`                 | Get all appointments of doctor |
+| PUT    | `/api/appointment/cancel/:appointmentId`  | Cancel user appointment        |
+| GET    | `/api/appointment/earnings`               | Get doctor earnings            |
 
+---
 
+## 📁 Project Structure
 
+```bash
+docpoint/
+│
+├── client/                  # React frontend
+│   ├── src/
+│   │   ├── components/
+│   │   ├── pages/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   └── tailwind.config.js
+│
+├── server/                  # Node.js backend
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middlewares/
+│   ├── uploads/
+│   ├── app.js
+│   └── config/
+│       └── db.js
+│
+├── .env
+├── package.json
+└── README.md
