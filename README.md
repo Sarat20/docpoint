@@ -80,25 +80,51 @@ It’s designed to provide a seamless and responsive experience for both mobile 
 
 ```bash
 docpoint/
-│
-├── client/                  # React frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── tailwind.config.js
-│
-├── server/                  # Node.js backend
+├── backend/
+│   ├── config/
+│   │   ├── cloudinary.js
+│   │   └── mongodb.js
 │   ├── controllers/
+│   │   ├── appointmentController.js
+│   │   ├── doctorController.js
+│   │   └── userController.js
+│   ├── middleware/
+│   │   ├── authDoctor.js
+│   │   ├── authUser.js
+│   │   └── multer.js
 │   ├── models/
+│   │   ├── appointmentModel.js
+│   │   ├── doctorModel.js
+│   │   └── userModel.js
 │   ├── routes/
-│   ├── middlewares/
+│   │   ├── appointmentRoute.js
+│   │   ├── doctorRoute.js
+│   │   └── userRoute.js
 │   ├── uploads/
-│   ├── app.js
-│   └── config/
-│       └── db.js
-│
-├── .env
-├── package.json
-└── README.md
+│   └── node_modules/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Header.jsx
+│   │   │   └── Navbar.jsx
+│   │   ├── DoctorPages/
+│   │   │   ├── DoctorDashboard.jsx
+│   │   │   ├── DoctorList.jsx
+│   │   │   ├── DoctorLogin.jsx
+│   │   │   └── DProfile.jsx
+│   │   ├── pages/
+│   │   │   ├── About.jsx
+│   │   │   ├── Contact.jsx
+│   │   │   ├── Home.jsx
+│   │   │   ├── Login.jsx
+│   │   │   ├── Profile.jsx
+│   │   │   └── UserAppointments.jsx
+│   │   ├── App.jsx
+│   │   ├── index.css
+│   │   └── main.jsx
+│   └── node_modules/
+
+
