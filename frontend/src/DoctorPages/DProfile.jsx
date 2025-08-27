@@ -3,8 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+import BASE_URL from '../config';
 
 const DProfile = () => {
     const { id } = useParams();

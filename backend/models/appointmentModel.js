@@ -43,5 +43,11 @@ const appointmentSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Indexes to optimize common queries
+appointmentSchema.index({ userId: 1, slotDate: 1 });
+appointmentSchema.index({ docId: 1, slotDate: 1 });
+appointmentSchema.index({ docId: 1, slotDate: 1, slotTime: 1 }, { unique: false });
+appointmentSchema.index({ cancelled: 1, payment: 1, isCompleted: 1 });
+
 const appointmentModel = mongoose.models.appointment || mongoose.model("appointment", appointmentSchema);
 export default appointmentModel;

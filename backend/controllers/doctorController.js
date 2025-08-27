@@ -147,8 +147,43 @@ const changeAvailability = async (req, res) => {
 
 const doctorList = async (req, res) => {
     try {
-        const doctors = await doctorModel.find({}).select(['-password', '-email']);
-        res.json({ success: true, doctors });
+        const {
+          speciality,
+          available,
+          page = 1,
+          limit = 12,
+        } = req.query;
+
+        const query = {};
+        if (speciality) query.speciality = speciality;
+        if (typeof available !== 'undefined') {
+          // Accept 'true'/'false' strings as booleans
+          query.available = String(available) === 'true';
+        }
+
+        const pageNum = Math.max(parseInt(page, 10) || 1, 1);
+        const limitNum = Math.min(Math.max(parseInt(limit, 10) || 12, 1), 100);
+
+        const [total, doctors] = await Promise.all([
+          doctorModel.countDocuments(query),
+          doctorModel
+            .find(query)
+            .select('name image speciality degree experience fees available')
+            .skip((pageNum - 1) * limitNum)
+            .limit(limitNum)
+            .lean()
+        ]);
+
+        // Light caching for list responses
+        res.set('Cache-Control', 'public, max-age=60');
+
+        res.json({
+          success: true,
+          doctors,
+          total,
+          page: pageNum,
+          pages: Math.ceil(total / limitNum) || 1,
+        });
 
     } catch (error) {
         console.log(error);
@@ -159,7 +194,8 @@ const doctorList = async (req, res) => {
 const appointmentsDoctor = async (req, res) => {
     try {
         const doctorId = req.user.id;
-        const appointments = await appointmentModel.find({ docId: doctorId });
+        const appointments = await appointmentModel.find({ docId: doctorId }).lean();
+
         res.json({ success: true, appointments });
     } catch (error) {
         console.error(error);
@@ -176,7 +212,7 @@ const getDoctorById = async (req, res) => {
   }
 
   try {
-    const doctor = await doctorModel.findById(doctorId).select("-password");
+    const doctor = await doctorModel.findById(doctorId).select("-password").lean();
     if (!doctor) {
       return res.status(404).json({ success: false, message: "Doctor not found" });
     }
@@ -191,17 +227,16 @@ const getDoctorById = async (req, res) => {
 
 const getDoctorProfile = async (req, res) => {
   try {
-    console.log("Decoded token user object:", req.user); // Debug log
+    console.log("Decoded token user object:", req.user); 
 
     const doctorId = req.user.id;
-    console.log("Doctor ID:", doctorId); // Debug log
+    console.log("Doctor ID:", doctorId); 
 
-    // Validate ObjectId
     if (!mongoose.Types.ObjectId.isValid(doctorId)) {
       return res.status(400).json({ success: false, message: "Invalid doctor ID" });
     }
 
-    const doctor = await doctorModel.findById(doctorId).select('-password');
+    const doctor = await doctorModel.findById(doctorId).select('-password').lean();
 
     if (!doctor) {
       return res.status(404).json({ success: false, message: "Doctor not found" });
@@ -219,7 +254,7 @@ const updateDoctorProfile = async (req, res) => {
   try {
     const doctorId = req.user.id;
 
-    const updateFields = req.body; // name, degree, speciality, etc.
+    const updateFields = req.body; 
 
     const updatedDoctor = await doctorModel.findByIdAndUpdate(
       doctorId,

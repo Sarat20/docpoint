@@ -36,5 +36,8 @@ const userSchema = new mongoose.Schema({
   }
 });
 
+// Indexes for performance and integrity
+userSchema.index({ email: 1 }, { unique: true });
+
 const userModel = mongoose.models.user || mongoose.model('user', userSchema);
 export default userModel;

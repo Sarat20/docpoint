@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const defaultImage = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+import BASE_URL from "../config";
 
 const Profile = () => {
   const [user, setUser] = useState({
@@ -28,7 +28,7 @@ const Profile = () => {
 
       const fetched = data.user;
       const addr = fetched.address || { line1: "", line2: "" };
-      setUser({ ...fetched, address: addr, image: "" });
+      setUser({ ...fetched, address: addr, image: "" }); 
       setPreview(fetched.image || defaultImage);
     } catch (err) {
       console.error("Fetch profile failed:", err.response?.data || err.message);
@@ -55,8 +55,8 @@ const Profile = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setUser((prev) => ({ ...prev, image: file }));
-      setPreview(URL.createObjectURL(file));
+      setUser((prev) => ({ ...prev, image: file })); 
+      setPreview(URL.createObjectURL(file)); 
     }
   };
 
@@ -70,8 +70,9 @@ const Profile = () => {
       fd.append("phone", user.phone);
       fd.append("gender", user.gender);
       fd.append("dob", user.dob);
-      fd.append("address", JSON.stringify(user.address));
-
+      fd.append("address", JSON.stringify(user.address)); 
+      
+  
       if (user.image instanceof File) {
         fd.append("image", user.image);
       }
@@ -81,14 +82,17 @@ const Profile = () => {
       const { data } = await axios.post(`${BASE_URL}/api/user/update-profile`, fd, {
         headers: {
           Authorization: `Bearer ${token}`,
+       
         }
       });
 
+     
       const updated = data.user;
       setUser({ ...updated, image: "", address: updated.address || { line1: "", line2: "" } });
       setPreview(updated.image || defaultImage);
       setMode("view");
       toast.success("Profile updated successfully.");
+
     } catch (err) {
       console.error("Update failed:", err.response?.data || err.message);
       toast.error("Failed to update profile.");

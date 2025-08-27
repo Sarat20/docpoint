@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+import BASE_URL from '../config';
 
 const DoctorLogin = () => {
   const navigate = useNavigate();
@@ -88,8 +87,7 @@ const DoctorLogin = () => {
       }
 
       const { data } = await axios.post(`${BASE_URL}${endpoint}`, payload, {
-        headers, 
-        withCredentials: true,
+        headers,
       });
 
       if (!data.success) {
@@ -104,10 +102,8 @@ const DoctorLogin = () => {
         });
 
         setTimeout(() => {
-  navigate("/doctor/dashboard");
-   window.location.reload(); 
-
-}, 1000);
+          navigate("/doctor/dashboard");
+        }, 500);
       }
     } catch (err) {
       console.error("Doctor login/signup error:", err.response?.data || err.message); 

@@ -3,7 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
+import BASE_URL from '../config';
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();

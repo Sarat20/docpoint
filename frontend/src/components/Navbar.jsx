@@ -3,9 +3,9 @@ import axios from "axios";
 import { assets } from "../assets/assets";
 import docpoint_logo from "../assets/docpoint_logo.png";
 import { NavLink, useNavigate } from "react-router-dom";
+import BASE_URL from "../config";
 
 const defaultImage = "https://cdn-icons-png.flaticon.com/512/149/149071.png";
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
 
 const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   const navigate = useNavigate();

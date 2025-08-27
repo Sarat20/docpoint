@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-
-const BASE_URL = import.meta.env.VITE_BACKEND_URL;
-console.log("ENV BACKEND URL:", BASE_URL);
-console.log("ENV BACKEND URL:", import.meta.env.VITE_BACKEND_URL);
+import BASE_URL from "../config";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -17,7 +14,6 @@ const Login = () => {
 
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-    console.log("Form updated:", { ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -34,36 +30,26 @@ const Login = () => {
         ? form
         : { email: form.email, password: form.password };
 
-    console.log("Submitting to:", `${BASE_URL}${endpoint}`);
-    console.log("Payload:", payload);
-
     try {
       const { data } = await axios.post(`${BASE_URL}${endpoint}`, payload, {
         headers: { "Content-Type": "application/json" },
-        withCredentials: true,
       });
-
-      console.log("API response:", data);
 
       if (!data.success) {
         setErrorMsg(data.message || "Something went wrong");
-        console.warn("❌ Backend responded with error:", data.message);
       } else {
         localStorage.setItem("token", data.token);
         setSuccessMsg(`${mode} successful!`);
-        console.log("✅ Success:", `${mode} successful!`);
         setForm({ name: "", email: "", password: "" });
 
         setTimeout(() => {
-          console.log("Navigating to home...");
           navigate("/");
-        }, 1000);
+        }, 500);
       }
     } catch (err) {
       const msg =
         err.response?.data?.message || "Server error – please try again later";
       setErrorMsg(msg);
-      console.error("❌ Axios error:", err);
     } finally {
       setLoading(false);
     }
@@ -137,10 +123,7 @@ const Login = () => {
             <p>
               Already have an account?{" "}
               <span
-                onClick={() => {
-                  console.log("Switching to Login mode");
-                  setMode("Login");
-                }}
+                onClick={() => setMode("Login")}
                 className="text-primary underline cursor-pointer">
                 Login here
               </span>
@@ -149,10 +132,7 @@ const Login = () => {
             <p>
               Create a new account?{" "}
               <span
-                onClick={() => {
-                  console.log("Switching to Sign Up mode");
-                  setMode("Sign Up");
-                }}
+                onClick={() => setMode("Sign Up")}
                 className="text-primary underline cursor-pointer">
                 Click here
               </span>
