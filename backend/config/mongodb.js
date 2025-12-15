@@ -9,9 +9,11 @@ const connectDB = async () => {
             serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
             socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
             family: 4, // Use IPv4, skip trying IPv6
-            bufferCommands: false, // Disable mongoose buffering
-            bufferMaxEntries: 0, // Disable mongoose buffering
         };
+
+        // Set mongoose-specific options
+        mongoose.set('bufferCommands', false);
+        mongoose.set('bufferMaxEntries', 0);
 
         mongoose.connection.on("connected", () => {
             console.log("MongoDB connected successfully");
