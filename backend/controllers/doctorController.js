@@ -194,9 +194,47 @@ const doctorList = async (req, res) => {
 const appointmentsDoctor = async (req, res) => {
     try {
         const doctorId = req.user.id;
-        const appointments = await appointmentModel.find({ docId: doctorId }).lean();
+        const { status, sortBy = 'date', sortOrder = 'desc' } = req.query;
+        
+        // Build query
+        const query = { docId: doctorId };
+        if (status === 'cancelled') {
+            query.cancelled = true;
+        } else if (status === 'active') {
+            query.cancelled = false;
+        }
 
-        res.json({ success: true, appointments });
+        // Build sort
+        const sort = {};
+        if (sortBy === 'date') {
+            sort.date = sortOrder === 'asc' ? 1 : -1;
+        } else if (sortBy === 'slotDate') {
+            sort.slotDate = sortOrder === 'asc' ? 1 : -1;
+        } else {
+            sort.date = -1; // Default
+        }
+
+        const appointments = await appointmentModel
+            .find(query)
+            .populate("userId", "name email phone image")
+            .sort(sort)
+            .lean();
+
+        // Calculate statistics
+        const stats = {
+            total: appointments.length,
+            active: appointments.filter(a => !a.cancelled).length,
+            cancelled: appointments.filter(a => a.cancelled).length,
+            totalEarnings: appointments
+                .filter(a => !a.cancelled)
+                .reduce((sum, a) => sum + (a.amount || 0), 0)
+        };
+
+        res.json({ 
+            success: true, 
+            appointments,
+            stats
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: error.message });
@@ -275,21 +313,68 @@ const updateDoctorProfile = async (req, res) => {
 
 
 const cancelAppointmentByDoctor = async (req, res) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const doctorId = req.user.id;
     const appointmentId = req.params.id;
 
-    const appointment = await appointmentModel.findOne({ _id: appointmentId, docId: doctorId });
-    if (!appointment) {
-      return res.status(404).json({ success: false, message: "Appointment not found" });
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(appointmentId)) {
+      await session.abortTransaction();
+      return res.status(400).json({ 
+        success: false, 
+        message: "Invalid appointment ID" 
+      });
     }
 
-    await appointmentModel.findByIdAndDelete(appointmentId);
+    // Find appointment and verify ownership
+    const appointment = await appointmentModel
+      .findOne({ _id: appointmentId, docId: doctorId })
+      .session(session);
 
-    res.json({ success: true, message: "Appointment cancelled successfully" });
+    if (!appointment) {
+      await session.abortTransaction();
+      return res.status(404).json({ 
+        success: false, 
+        message: "Appointment not found or you don't have permission" 
+      });
+    }
+
+    // Mark as cancelled instead of deleting (preserve history)
+    appointment.cancelled = true;
+    await appointment.save({ session });
+
+    // Release slot in doctor's slots_booked
+    if (appointment.slotDate && appointment.slotTime) {
+      await doctorModel.findByIdAndUpdate(
+        doctorId,
+        {
+          $unset: {
+            [`slots_booked.${appointment.slotDate}.${appointment.slotTime}`]: ""
+          }
+        },
+        { session }
+      );
+    }
+
+    await session.commitTransaction();
+
+    res.json({ 
+      success: true, 
+      message: "Appointment cancelled successfully",
+      appointment
+    });
   } catch (error) {
+    await session.abortTransaction();
     console.error("Doctor Cancel Error:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    res.status(500).json({ 
+      success: false, 
+      message: error.message || "Internal Server Error" 
+    });
+  } finally {
+    session.endSession();
   }
 };
 
