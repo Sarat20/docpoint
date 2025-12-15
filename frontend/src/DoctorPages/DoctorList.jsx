@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import BASE_URL from '../config';
@@ -18,6 +18,8 @@ const DoctorList = () => {
   ];
 
   useEffect(() => {
+    let isCancelled = false;
+    
     const fetchDoctors = async () => {
       setLoading(true);
       try {
@@ -28,29 +30,38 @@ const DoctorList = () => {
           available: 'true',
         });
         const url = `${BASE_URL}/api/doctor/list?${params.toString()}`;
-        const { data } = await axios.get(url);
-        if (data.success) {
+        const { data } = await axios.get(url, {
+          // Add timeout to prevent hanging requests
+          timeout: 10000,
+        });
+        
+        if (!isCancelled && data.success) {
           setDoctors(data.doctors || []);
           setPages(data.pages || 1);
           setTotal(data.total || 0);
         }
       } catch (err) {
-        console.error("Failed to fetch doctors:", err);
+        if (!isCancelled) {
+          console.error("Failed to fetch doctors:", err);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
-    fetchDoctors();
+    
+    // Debounce the fetch to avoid rapid calls
+    const timeoutId = setTimeout(fetchDoctors, 300);
+    
+    return () => {
+      isCancelled = true;
+      clearTimeout(timeoutId);
+    };
   }, [selectedSpeciality, page]);
 
-  const filteredDoctors = doctors; // now server-side filtered
-
-  const onChangeSpeciality = (item) => {
-    setSelectedSpeciality(item);
-    setPage(1);
-  };
-
-  const transformCloudinaryThumb = (url) => {
+  // Memoize the transform function to avoid recreating it on every render
+  const transformCloudinaryThumb = useCallback((url) => {
     try {
       if (!url) return url;
       const marker = '/upload/';
@@ -58,10 +69,15 @@ const DoctorList = () => {
       if (idx === -1) return url;
       const prefix = url.substring(0, idx + marker.length);
       const suffix = url.substring(idx + marker.length);
-      const transform = 'f_auto,q_auto,w_400,h_240,c_fill';
+      const transform = 'f_auto,q_auto,w_300,h_200,c_fill'; // Smaller images for faster loading
       return `${prefix}${transform}/${suffix}`;
     } catch { return url; }
-  };
+  }, []);
+
+  const onChangeSpeciality = useCallback((item) => {
+    setSelectedSpeciality(item);
+    setPage(1);
+  }, []);
 
   return (
     <div className="min-h-[80vh] p-6">
@@ -100,6 +116,10 @@ const DoctorList = () => {
                   alt={doctor.name}
                   className="w-full h-40 object-cover rounded-md mb-3"
                   loading="lazy"
+                  decoding="async"
+                  onError={(e) => {
+                    e.target.src = 'https://via.placeholder.com/300x200?text=Doctor';
+                  }}
                 />
                 <h2 className="text-lg font-semibold">{doctor.name}</h2>
                 <p className="text-sm text-gray-600">{doctor.degree}</p>
@@ -132,4 +152,5 @@ const DoctorList = () => {
   );
 };
 
-export default DoctorList;
+// Memoize component to prevent unnecessary re-renders
+export default React.memo(DoctorList);

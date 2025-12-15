@@ -265,23 +265,25 @@ const getDoctorById = async (req, res) => {
 
 const getDoctorProfile = async (req, res) => {
   try {
-    console.log("Decoded token user object:", req.user); 
-
     const doctorId = req.user.id;
-    console.log("Doctor ID:", doctorId); 
 
     if (!mongoose.Types.ObjectId.isValid(doctorId)) {
       return res.status(400).json({ success: false, message: "Invalid doctor ID" });
     }
 
-    const doctor = await doctorModel.findById(doctorId).select('-password').lean();
+    // Select only needed fields and use lean() for performance
+    const doctor = await doctorModel
+      .findById(doctorId)
+      .select('-password')
+      .lean();
 
     if (!doctor) {
       return res.status(404).json({ success: false, message: "Doctor not found" });
     }
 
+    // Cache profile data (short cache since it can change)
+    res.set('Cache-Control', 'private, max-age=120');
     res.status(200).json({ success: true, doctor });
-
   } catch (error) {
     console.error("Error in getDoctorProfile:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });

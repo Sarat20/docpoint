@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { toast } from 'react-toastify';
@@ -39,8 +39,44 @@ const UserAppointments = () => {
   
   // Fetch appointments on component mount
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    let isCancelled = false;
+    
+    const loadAppointments = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please log in to view appointments.");
+        navigate("/login");
+        return;
+      }
+
+      try {
+        const res = await axios.get(`${BASE_URL}/api/appointment/user`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          timeout: 10000, // 10 second timeout
+        });
+
+        if (!isCancelled && res.data.success) {
+          setAppointments(res.data.appointments);
+        }
+      } catch (err) {
+        if (!isCancelled) {
+          toast.error(err.response?.data?.message || "Failed to fetch appointments.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadAppointments();
+    
+    return () => {
+      isCancelled = true;
+    };
+  }, [navigate]);
 
   // Function to handle appointment cancellation
   const handleCancel = async (appointmentId) => {
@@ -94,6 +130,11 @@ const UserAppointments = () => {
                 src={app.docId.image} 
                 alt={app.docId.name} 
                 className="w-24 h-24 rounded-full object-cover border-2 border-blue-200"
+                loading="lazy"
+                decoding="async"
+                onError={(e) => {
+                  e.target.src = 'https://cdn-icons-png.flaticon.com/512/149/149071.png';
+                }}
               />
               <div className="flex-grow">
                 <div className="flex justify-between items-start">

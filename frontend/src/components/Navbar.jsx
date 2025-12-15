@@ -17,13 +17,36 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
   if (isDoctorLoggedIn) return null;
 
   useEffect(() => {
+    // Debounce profile image fetch to avoid excessive API calls
+    let timeoutId;
     const fetchProfileImage = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          setProfileImage(defaultImage);
+          return;
+        }
+
+        // Check if we have cached image in localStorage
+        const cachedImage = localStorage.getItem('userProfileImage');
+        const cacheTime = localStorage.getItem('userProfileImageTime');
+        
+        // Use cached image if less than 5 minutes old
+        if (cachedImage && cacheTime && Date.now() - parseInt(cacheTime) < 300000) {
+          setProfileImage(cachedImage);
+          return;
+        }
+
         const { data } = await axios.get(`${BASE_URL}/api/user/get-profile`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setProfileImage(data.user.image || defaultImage);
+        
+        const imageUrl = data.user.image || defaultImage;
+        setProfileImage(imageUrl);
+        
+        // Cache the image URL
+        localStorage.setItem('userProfileImage', imageUrl);
+        localStorage.setItem('userProfileImageTime', Date.now().toString());
       } catch (err) {
         console.error("Failed to load avatar:", err);
         setProfileImage(defaultImage);
@@ -31,8 +54,15 @@ const Navbar = ({ isLoggedIn, setIsLoggedIn }) => {
     };
 
     if (isLoggedIn) {
-      fetchProfileImage();
+      // Debounce to prevent multiple calls
+      timeoutId = setTimeout(fetchProfileImage, 100);
+    } else {
+      setProfileImage(defaultImage);
     }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, [isLoggedIn]);
 
   const handleLogout = () => {

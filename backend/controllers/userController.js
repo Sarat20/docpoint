@@ -67,11 +67,18 @@ const loginUser = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
-    const userData = await userModel.findById(req.user.id).select('-password').lean();
+    // Use lean() for better performance and select only needed fields
+    const userData = await userModel
+      .findById(req.user.id)
+      .select('name email image address gender dob phone')
+      .lean();
+    
     if (!userData) {
       return res.status(404).json({ success: false, message: "User not found" });
     }
 
+    // Set cache headers for profile data (short cache since it can change)
+    res.set('Cache-Control', 'private, max-age=60');
     res.status(200).json({ success: true, user: userData });
   } catch (error) {
     console.error(error);

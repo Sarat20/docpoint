@@ -57,7 +57,6 @@ const doctorSchema=new mongoose.Schema({
 
 },{minimize:false})
 
-// Optimize common list queries
 doctorSchema.index({ speciality: 1, available: 1 });
 
 const doctorModel=mongoose.models.doctor || mongoose.model('doctor',doctorSchema);
