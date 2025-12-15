@@ -11,9 +11,8 @@ const connectDB = async () => {
             family: 4, // Use IPv4, skip trying IPv6
         };
 
-        // Set mongoose-specific options
+        // Disable mongoose buffering (commands fail immediately if not connected)
         mongoose.set('bufferCommands', false);
-        mongoose.set('bufferMaxEntries', 0);
 
         mongoose.connection.on("connected", () => {
             console.log("MongoDB connected successfully");
