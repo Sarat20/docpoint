@@ -102,10 +102,10 @@ const DoctorList = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 flex-1">
           {loading ? (
             <p>Loading doctors...</p>
-          ) : filteredDoctors.length === 0 ? (
+          ) : doctors.length === 0 ? (
             <p>No doctors found for this speciality.</p>
           ) : (
-            filteredDoctors.map((doctor) => (
+            doctors.map((doctor) => (
               <div
                 key={doctor._id}
                 onClick={() => navigate(`/doctor/${doctor._id}`)}
